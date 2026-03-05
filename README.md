@@ -5,14 +5,14 @@
 
 Claude Code 커스텀 스킬 기반 AI 개발 파이프라인.
 
-`/pipeline`을 실행하면 팀장 역할의 AI가 전문 에이전트들을 순서대로 디스패치해서 리서치부터 구현, 리뷰, 버그 수정까지 자동으로 처리합니다.
+`/pipeline`을 실행하면 리드 에이전트가 전문 에이전트들을 순서대로 디스패치해서 리서치부터 구현, 리뷰, 버그 수정까지 자동으로 처리합니다.
 
 ## 구조
 
 ```
 /pipeline 결제 시스템 연동해줘
 
-→ 팀장(Pipeline)이 상황 판단
+→ 리드 에이전트(Pipeline)가 상황 판단
   → Web Researcher (haiku)  — 웹 검색 + 정보 수집
   → Code Analyzer (sonnet)  — 코드베이스 분석 + 종합
   → Planner (opus)          — 태스크 분해 + 설계
@@ -25,7 +25,6 @@ Claude Code 커스텀 스킬 기반 AI 개발 파이프라인.
 각 에이전트는 격리된 서브프로세스로 실행되고, `.pipeline/` 디렉토리의 마크다운 파일로 소통합니다.
 
 ## 에이전트 팀
-<!-- Bugfixer는 haiku가 하는거 아니었나? 확인하고 수저해야해 -->
 | Agent | Role | Model | Specialty |
 |-------|------|-------|-----------|
 | Web Researcher | 웹 검색 + 정보 수집 | haiku | 빠르고 저렴한 정보 수집 |
@@ -36,10 +35,9 @@ Claude Code 커스텀 스킬 기반 AI 개발 파이프라인.
 | Bugfixer | 이슈 수정 | sonnet | 지시된 수정, 속도 중요 |
 
 ## 주요 기능
-<!-- 팀장 AI 라고 해줘용 아니면 매니저 라던가, 리더? 좀 더 꼰대같지 않은 워딩이 좋을 것 같아요(로컬에서는 괜찮아요) -->
-### 팀장의 자율 판단
+### 리드 에이전트의 자율 판단
 
-Decision Matrix는 기본 가이드라인일 뿐, 팀장이 상황에 따라 단계를 건너뛰거나 조정합니다.
+Decision Matrix는 기본 가이드라인일 뿐, 리드 에이전트가 상황에 따라 단계를 건너뛰거나 조정합니다.
 
 ```
 우선순위: User Override > 자율 판단 > Decision Matrix (Default)
@@ -80,7 +78,7 @@ Implementer가 태스크를 완료할 때마다 `progress.md`를 갱신합니다
 
 | 스킬 | 설명 | 단독 사용 |
 |------|------|-----------|
-| `/pipeline` | 풀 파이프라인 (팀장이 판단해서 에이전트 디스패치) | O |
+| `/pipeline` | 풀 파이프라인 (리드 에이전트가 판단해서 디스패치) | O |
 | `/research` | 웹 리서치 + 코드베이스 분석 | O |
 | `/plan` | 구현 플랜 작성 | O |
 | `/implement` | 플랜 기반 구현 | O |
@@ -91,20 +89,11 @@ Implementer가 태스크를 완료할 때마다 `progress.md`를 갱신합니다
 
 ## 설치
 
-`~/.claude/skills/` 디렉토리에 각 스킬 폴더를 복사합니다.
-
-```bash
-git clone https://github.com/sunmerrr/claude-pipeline.git
-cd claude-pipeline
-./install.sh
-```
-
-### 플러그인 마켓플레이스 (Plugin Marketplace)
-
 Claude Code에서 직접 설치:
 
 ```bash
 /plugin marketplace add sunmerrr/claude-pipeline
+/plugin install claude-pipeline@sunmerrr-claude-pipeline
 ```
 
 ### 권장 Permission 설정
@@ -141,7 +130,7 @@ Claude Code에서 직접 설치:
 
 # 리서치 건너뛰기
 /pipeline 사이드바에 알림 아이콘 추가해줘
-# → 팀장이 자율 판단으로 research 생략 가능
+# → 리드 에이전트가 자율 판단으로 research 생략 가능
 
 # 개별 스킬 사용
 /research WebSocket 실시간 알림
@@ -175,15 +164,14 @@ Retrospective  → retrospective.md
 
 **claude-pipeline** is a set of Claude Code custom skills that orchestrate an AI development team — from research and planning through implementation, review, and bugfix — all driven by a pipeline leader agent.
 
-**Install:**
+**Install in Claude Code:**
 
 ```bash
-git clone https://github.com/sunmerrr/claude-pipeline.git
-cd claude-pipeline
-./install.sh
+/plugin marketplace add sunmerrr/claude-pipeline
+/plugin install claude-pipeline@sunmerrr-claude-pipeline
 ```
 
-**Basic usage in Claude Code:**
+**Basic usage:**
 
 ```
 /pipeline add user authentication with OAuth2
