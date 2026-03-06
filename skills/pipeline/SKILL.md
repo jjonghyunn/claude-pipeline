@@ -32,12 +32,21 @@ You are the team lead of an AI development team. You manage 5 specialized agents
    - "결제 연동해줘" → `payment-integration`
    - "버그 고쳐줘: 토큰 만료" → `fix-token-expiry`
 
-3. **Workspace 경로 설정**: `.pipeline/{project-name}/{task-slug}/`
+3. **Git Worktree 생성** — 모든 작업은 메인 브랜치와 격리된 worktree에서 진행한다:
    ```bash
-   mkdir -p .pipeline/{project-name}/{task-slug}
+   git worktree add .worktrees/{task-slug} -b pipeline/{task-slug}
+   ```
+   - worktree 경로: `{원래 프로젝트 경로}/.worktrees/{task-slug}/`
+   - 브랜치: `pipeline/{task-slug}`
+   - 이미 같은 이름의 worktree가 존재하면 기존 worktree를 이어서 사용한다 (재실행으로 간주)
+   - 이미 같은 이름의 브랜치가 존재하지만 worktree가 없으면: `git worktree add .worktrees/{task-slug} pipeline/{task-slug}`
+
+4. **Workspace 경로 설정**: worktree 내부에 아티팩트 디렉토리를 생성한다:
+   ```bash
+   mkdir -p .worktrees/{task-slug}/.pipeline/{project-name}/{task-slug}
    ```
 
-같은 이름의 task-slug가 이미 존재하면 기존 아티팩트를 이어서 사용한다 (재실행으로 간주).
+**이후 모든 에이전트의 working directory는 worktree 경로(`{원래 경로}/.worktrees/{task-slug}/`)를 사용한다.**
 
 ## Step 2: Assess Project State
 
@@ -129,6 +138,9 @@ Display your decision:
   Task: {user's request}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+Worktree: .worktrees/{task-slug}/
+Branch:   pipeline/{task-slug}
+
 Project state:
   research.md  — {있음/없음}
   plan.md      — {있음/없음}
@@ -159,7 +171,7 @@ For each agent, use the Task tool with:
 **CRITICAL**: Each Task agent prompt must include:
 1. The full content of the corresponding SKILL.md (read it first)
 2. Override the artifact path to `.pipeline/{project-name}/{task-slug}/` instead of `.pipeline/`
-3. The current working directory context
+3. **Working directory는 반드시 worktree 경로를 사용**: `{원래 경로}/.worktrees/{task-slug}/`
 
 ### Research Phase (2-step)
 
@@ -305,6 +317,9 @@ After completion, verify `.pipeline/{project-name}/{task-slug}/retrospective.md`
   Task: {task-slug}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+Worktree: .worktrees/{task-slug}/
+Branch:   pipeline/{task-slug}
+
 Agents dispatched: {N}
   ✓ Research    — .pipeline/{project-name}/{task-slug}/research.md
   ✓ Plan        — .pipeline/{project-name}/{task-slug}/plan.md
@@ -313,16 +328,23 @@ Agents dispatched: {N}
   ✓ Bugfix      — {N issues fixed}
   ✓ Retrospective — .pipeline/{project-name}/{task-slug}/retrospective.md
 
-→ Review the changes and commit when ready.
+→ 변경사항을 확인하고 메인 브랜치에 머지하세요:
+  cd .worktrees/{task-slug}
+  git add -A && git commit -m "feat: {task-slug}"
+  git checkout main
+  git merge pipeline/{task-slug}
+  git worktree remove .worktrees/{task-slug}
 ```
 
 ## Rules
 
 - ALWAYS use the Task tool to dispatch agents — never execute their work directly in this session
 - Each agent MUST run as an isolated subprocess (separate context)
+- **모든 에이전트는 worktree 경로에서 작업해야 한다** — 메인 working directory에서 직접 작업하지 않는다
 - Pass artifacts via `.pipeline/{project-name}/{task-slug}/` files only — no shared context
 - Verify each agent's output artifact exists before proceeding to the next agent
 - If an agent fails, report the error and ask the user: Retry / Skip / Abort
 - Do NOT commit changes — let the user decide when to commit
+- Do NOT remove the worktree — let the user review and merge
 - Write all output in the same language the user has been using in the conversation
 - When reading SKILL.md files to pass to agents, read the FULL content and pass it as-is in the prompt

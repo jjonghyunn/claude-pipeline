@@ -11,3 +11,6 @@ Thumbs.db
 
 # Pipeline artifacts (user-generated per run)
 .pipeline/
+
+# Git worktrees (created by /pipeline)
+.worktrees/

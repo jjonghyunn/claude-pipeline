@@ -23,7 +23,7 @@ Run `/pipeline` and a lead agent automatically dispatches specialized agents in 
   → Retrospective           — retrospective + skill self-improvement
 ```
 
-Each agent runs in an isolated subprocess and communicates through markdown files in the `.pipeline/` directory.
+Each agent runs in an isolated subprocess within a **git worktree**, keeping the main branch untouched. Agents communicate through markdown files in the `.pipeline/` directory.
 
 ## Agent Team
 
@@ -50,23 +50,33 @@ Priority: User Override > Autonomous Judgment > Decision Matrix (Default)
 - New tech adoption, external API integration → research required
 - User says "skip research" → always respected
 
-### Per-Task Workspace Isolation
+### Git Worktree Isolation
 
-Multiple tasks in the same project never collide — each gets its own artifact directory.
+Every `/pipeline` run creates a dedicated git worktree and branch, so the main branch stays clean until you're ready to merge.
 
 ```
-.pipeline/
-  my-app/
-    login-feature/
-      research.md
-      plan.md
-      progress.md
-      review.md
-      retrospective.md
-    payment-integration/
-      research.md
-      plan.md
-      ...
+.worktrees/
+  login-feature/          ← branch: pipeline/login-feature
+    .pipeline/
+      my-app/
+        login-feature/
+          research.md
+          plan.md
+          progress.md
+          review.md
+          retrospective.md
+    src/
+    ...
+```
+
+After the pipeline completes, review and merge at your own pace:
+
+```bash
+cd .worktrees/login-feature
+git add -A && git commit -m "feat: login feature"
+git checkout main
+git merge pipeline/login-feature
+git worktree remove .worktrees/login-feature
 ```
 
 ### Build & Test Verification
