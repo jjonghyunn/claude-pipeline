@@ -2,7 +2,7 @@
 set -e
 
 SKILLS_DIR="$HOME/.claude/skills"
-SKILLS=(pipeline research plan implement review bugfix retrospective)
+SKILLS=(pipeline research plan implement review bugfix retrospective sanicheck makemd new-campaign)
 
 # Colors
 GREEN='\033[0;32m'
@@ -40,6 +40,9 @@ parse_args() {
         echo "  /review     Code review + build/test"
         echo "  /bugfix     Fix issues from review"
         echo "  /retrospective Pipeline retrospective + skill improvement"
+        echo "  /sanicheck  Scan for sanitize rule violations before committing"
+        echo "  /makemd     Generate Korean markdown docs from a Python script"
+        echo "  /new-campaign  Scaffold a new campaign folder structure"
         exit 0
         ;;
       *)
@@ -135,6 +138,9 @@ install_skills() {
   echo "  /review     Code review + build/test"
   echo "  /bugfix     Fix issues from review"
   echo "  /retrospective  Pipeline retrospective + skill improvement"
+  echo "  /sanicheck  Scan for sanitize rule violations before committing"
+  echo "  /makemd     Generate Korean markdown docs from a Python script"
+  echo "  /new-campaign  Scaffold a new campaign folder structure"
 }
 
 # Main

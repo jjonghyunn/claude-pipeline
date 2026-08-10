@@ -98,6 +98,9 @@ The Implementer updates `progress.md` after completing each task.
 | `/review` | Code review + build/test | Yes |
 | `/bugfix` | Fix issues from review | Yes |
 | `/retrospective` | Pipeline retrospective + skill self-improvement | Yes |
+| `/sanicheck` | Scan for sanitize rule violations before committing | Yes |
+| `/makemd` | Read a Python script and generate Korean markdown docs | Yes |
+| `/new-campaign` | Scaffold a new campaign folder structure | Yes |
 
 Each skill can be used independently without `/pipeline`.
 

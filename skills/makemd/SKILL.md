@@ -67,4 +67,6 @@ Read a Python script and generate a Korean markdown documentation file.
 - Use tables extensively.
 - Express processing flow with `↓` arrows.
 - Keep it concise — practical reference level, not exhaustive.
-- Apply sanitize rules (user_name→user_name, company_name→company_name, etc.).
+- Apply the sanitize rules from `~/.claude/CLAUDE.md` (section: **Commit Sanitize Rules**)
+  before writing anything that may end up in a public repository. Do not restate the rule
+  table here — read it from that file at run time.
